@@ -20,7 +20,6 @@ Other Style Guides
 
 ## Table of Contents
 
-  1. [Types](#types)
   1. [References](#references)
   1. [Objects](#objects)
   1. [Arrays](#arrays)
@@ -33,7 +32,6 @@ Other Style Guides
   1. [Iterators and Generators](#iterators-and-generators)
   1. [Properties](#properties)
   1. [Variables](#variables)
-  1. [Hoisting](#hoisting)
   1. [Comparison Operators & Equality](#comparison-operators--equality)
   1. [Blocks](#blocks)
   1. [Control Statements](#control-statements)
@@ -44,12 +42,7 @@ Other Style Guides
   1. [Type Casting & Coercion](#type-casting--coercion)
   1. [Naming Conventions](#naming-conventions)
   1. [Accessors](#accessors)
-  1. [Events](#events)
-  1. [jQuery](#jquery)
-  1. [ECMAScript 5 Compatibility](#ecmascript-5-compatibility)
-  1. [ECMAScript 6+ (ES 2015+) Styles](#ecmascript-6-es-2015-styles)
   1. [Standard Library](#standard-library)
-  1. [Testing](#testing)
   1. [Performance](#performance)
   1. [Resources](#resources)
   1. [In the Wild](#in-the-wild)
@@ -59,48 +52,6 @@ Other Style Guides
   1. [Contributors](#contributors)
   1. [License](#license)
   1. [Amendments](#amendments)
-
-## Types
-
-  <a name="types--primitives"></a><a name="1.1"></a>
-  - [1.1](#types--primitives) **Primitives**: When you access a primitive type you work directly on its value.
-
-    - `string`
-    - `number`
-    - `boolean`
-    - `null`
-    - `undefined`
-    - `symbol`
-    - `bigint`
-
-    ```javascript
-    const foo = 1;
-    let bar = foo;
-
-    bar = 9;
-
-    console.log(foo, bar); // => 1, 9
-    ```
-
-    - Symbols and BigInts cannot be faithfully polyfilled, so they should not be used when targeting browsers/environments that don’t support them natively.
-
-  <a name="types--complex"></a><a name="1.2"></a>
-  - [1.2](#types--complex)  **Complex**: When you access a complex type you work on a reference to its value.
-
-    - `object`
-    - `array`
-    - `function`
-
-    ```javascript
-    const foo = [1, 2];
-    const bar = foo;
-
-    bar[0] = 9;
-
-    console.log(foo[0], bar[0]); // => 9, 9
-    ```
-
-**[⬆ back to top](#table-of-contents)**
 
 ## References
 
@@ -189,29 +140,6 @@ Other Style Guides
       id: 5,
       name: 'San Francisco',
       [getKey('enabled')]: true,
-    };
-    ```
-
-  <a name="es6-object-shorthand"></a><a name="3.5"></a>
-  - [3.3](#es6-object-shorthand) Use object method shorthand. eslint: [`object-shorthand`](https://eslint.org/docs/rules/object-shorthand.html)
-
-    ```javascript
-    // bad
-    const atom = {
-      value: 1,
-
-      addValue: function (value) {
-        return atom.value + value;
-      },
-    };
-
-    // good
-    const atom = {
-      value: 1,
-
-      addValue(value) {
-        return atom.value + value;
-      },
     };
     ```
 
@@ -382,75 +310,6 @@ Other Style Guides
 
     // best
     const nodes = [...foo];
-    ```
-
-  <a name="arrays--from-array-like"></a>
-  - [4.5](#arrays--from-array-like) Use [`Array.from`](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/from) for converting an array-like object to an array.
-
-    ```javascript
-    const arrLike = { 0: 'foo', 1: 'bar', 2: 'baz', length: 3 };
-
-    // bad
-    const arr = Array.prototype.slice.call(arrLike);
-
-    // good
-    const arr = Array.from(arrLike);
-    ```
-
-  <a name="arrays--mapping"></a>
-  - [4.6](#arrays--mapping) Use [`Array.from`](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Array/from) instead of spread `...` for mapping over iterables, because it avoids creating an intermediate array.
-
-    ```javascript
-    // bad
-    const baz = [...foo].map(bar);
-
-    // good
-    const baz = Array.from(foo, bar);
-    ```
-
-  <a name="arrays--callback-return"></a><a name="4.5"></a>
-  - [4.7](#arrays--callback-return) Use return statements in array method callbacks. It’s ok to omit the return if the function body consists of a single statement returning an expression without side effects, following [8.2](#arrows--implicit-return). eslint: [`array-callback-return`](https://eslint.org/docs/rules/array-callback-return)
-
-    ```javascript
-    // good
-    [1, 2, 3].map((x) => {
-      const y = x + 1;
-      return x * y;
-    });
-
-    // good
-    [1, 2, 3].map((x) => x + 1);
-
-    // bad - no returned value means `acc` becomes undefined after the first iteration
-    [[0, 1], [2, 3], [4, 5]].reduce((acc, item, index) => {
-      const flatten = acc.concat(item);
-    });
-
-    // good
-    [[0, 1], [2, 3], [4, 5]].reduce((acc, item, index) => {
-      const flatten = acc.concat(item);
-      return flatten;
-    });
-
-    // bad
-    inbox.filter((msg) => {
-      const { subject, author } = msg;
-      if (subject === 'Mockingbird') {
-        return author === 'Harper Lee';
-      } else {
-        return false;
-      }
-    });
-
-    // good
-    inbox.filter((msg) => {
-      const { subject, author } = msg;
-      if (subject === 'Mockingbird') {
-        return author === 'Harper Lee';
-      }
-
-      return false;
-    });
     ```
 
   <a name="arrays--bracket-newline"></a>
@@ -645,29 +504,6 @@ Other Style Guides
 **[⬆ back to top](#table-of-contents)**
 
 ## Functions
-
-  <a name="functions--declarations"></a><a name="7.1"></a>
-  - [7.1](#functions--declarations) Use named function expressions instead of function declarations. eslint: [`func-style`](https://eslint.org/docs/rules/func-style)
-
-    > Why? Function declarations are hoisted, which means that it’s easy - too easy - to reference the function before it is defined in the file. This harms readability and maintainability. If you find that a function’s definition is large or complex enough that it is interfering with understanding the rest of the file, then perhaps it’s time to extract it to its own module! Don’t forget to explicitly name the expression, regardless of whether or not the name is inferred from the containing variable (which is often the case in modern browsers or when using compilers such as Babel). This eliminates any assumptions made about the Error’s call stack. ([Discussion](https://github.com/airbnb/javascript/issues/794))
-
-    ```javascript
-    // bad
-    function foo() {
-      // ...
-    }
-
-    // bad
-    const foo = function () {
-      // ...
-    };
-
-    // good
-    // lexical name distinguished from the variable-referenced invocation(s)
-    const short = function longUniqueMoreDescriptiveLexicalFoo() {
-      // ...
-    };
-    ```
 
   <a name="functions--iife"></a><a name="7.2"></a>
   - [7.2](#functions--iife) Wrap immediately invoked function expressions in parentheses. eslint: [`wrap-iife`](https://eslint.org/docs/rules/wrap-iife.html)
@@ -1427,22 +1263,7 @@ Other Style Guides
       longNameE,
     } from 'path';
     ```
-
-  <a name="modules--no-webpack-loader-syntax"></a>
-  - [10.9](#modules--no-webpack-loader-syntax) Disallow Webpack loader syntax in module import statements.
- eslint: [`import/no-webpack-loader-syntax`](https://github.com/benmosher/eslint-plugin-import/blob/master/docs/rules/no-webpack-loader-syntax.md)
-    > Why? Since using Webpack syntax in the imports couples the code to a module bundler. Prefer using the loader syntax in `webpack.config.js`.
-
-    ```javascript
-    // bad
-    import fooSass from 'css!sass!foo.scss';
-    import barCss from 'style!css!bar.css';
-
-    // good
-    import fooSass from 'foo.scss';
-    import barCss from 'bar.css';
-    ```
-
+    
   <a name="modules--import-extensions"></a>
   - [10.10](#modules--import-extensions) Do not include JavaScript filename extensions
  eslint: [`import/extensions`](https://github.com/benmosher/eslint-plugin-import/blob/master/docs/rules/extensions.md)
@@ -1508,72 +1329,6 @@ Other Style Guides
     const increasedByOne = numbers.map((num) => num + 1);
     ```
 
-  <a name="generators--nope"></a><a name="11.2"></a>
-  - [11.2](#generators--nope) Don’t use generators for now.
-
-    > Why? They don’t transpile well to ES5.
-
-  <a name="generators--spacing"></a>
-  - [11.3](#generators--spacing) If you must use generators, or if you disregard [our advice](#generators--nope), make sure their function signature is spaced properly. eslint: [`generator-star-spacing`](https://eslint.org/docs/rules/generator-star-spacing)
-
-    > Why? `function` and `*` are part of the same conceptual keyword - `*` is not a modifier for `function`, `function*` is a unique construct, different from `function`.
-
-    ```javascript
-    // bad
-    function * foo() {
-      // ...
-    }
-
-    // bad
-    const bar = function * () {
-      // ...
-    };
-
-    // bad
-    const baz = function *() {
-      // ...
-    };
-
-    // bad
-    const quux = function*() {
-      // ...
-    };
-
-    // bad
-    function*foo() {
-      // ...
-    }
-
-    // bad
-    function *foo() {
-      // ...
-    }
-
-    // very bad
-    function
-    *
-    foo() {
-      // ...
-    }
-
-    // very bad
-    const wat = function
-    *
-    () {
-      // ...
-    };
-
-    // good
-    function* foo() {
-      // ...
-    }
-
-    // good
-    const foo = function* () {
-      // ...
-    };
-    ```
-
 **[⬆ back to top](#table-of-contents)**
 
 ## Properties
@@ -1608,17 +1363,6 @@ Other Style Guides
     }
 
     const isJedi = getProp('jedi');
-    ```
-
-  <a name="es2016-properties--exponentiation-operator"></a>
-  - [12.3](#es2016-properties--exponentiation-operator) Use exponentiation operator `**` when calculating exponentiations. eslint: [`no-restricted-properties`](https://eslint.org/docs/rules/no-restricted-properties).
-
-    ```javascript
-    // bad
-    const binary = Math.pow(2, 10);
-
-    // good
-    const binary = 2 ** 10;
     ```
 
 **[⬆ back to top](#table-of-contents)**
@@ -1724,39 +1468,6 @@ Other Style Guides
     }
     ```
 
-  <a name="variables--no-chain-assignment"></a><a name="13.5"></a>
-  - [13.5](#variables--no-chain-assignment) Don’t chain variable assignments. eslint: [`no-multi-assign`](https://eslint.org/docs/rules/no-multi-assign)
-
-    > Why? Chaining variable assignments creates implicit global variables.
-
-    ```javascript
-    // bad
-    (function example() {
-      // JavaScript interprets this as
-      // let a = ( b = ( c = 1 ) );
-      // The let keyword only applies to variable a; variables b and c become
-      // global variables.
-      let a = b = c = 1;
-    }());
-
-    console.log(a); // throws ReferenceError
-    console.log(b); // 1
-    console.log(c); // 1
-
-    // good
-    (function example() {
-      let a = 1;
-      let b = a;
-      let c = a;
-    }());
-
-    console.log(a); // throws ReferenceError
-    console.log(b); // throws ReferenceError
-    console.log(c); // throws ReferenceError
-
-    // the same applies for `const`
-    ```
-
   <a name="variables--unary-increment-decrement"></a><a name="13.6"></a>
   - [13.6](#variables--unary-increment-decrement) Avoid using unary increments and decrements (`++`, `--`). eslint [`no-plusplus`](https://eslint.org/docs/rules/no-plusplus)
 
@@ -1856,105 +1567,6 @@ Other Style Guides
 
 **[⬆ back to top](#table-of-contents)**
 
-## Hoisting
-
-  <a name="hoisting--about"></a><a name="14.1"></a>
-  - [14.1](#hoisting--about) `var` declarations get hoisted to the top of their closest enclosing function scope, their assignment does not. `const` and `let` declarations are blessed with a new concept called [Temporal Dead Zones (TDZ)](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/let#Temporal_dead_zone). It’s important to know why [typeof is no longer safe](https://web.archive.org/web/20200121061528/http://es-discourse.com/t/why-typeof-is-no-longer-safe/15).
-
-    ```javascript
-    // we know this wouldn’t work (assuming there
-    // is no notDefined global variable)
-    function example() {
-      console.log(notDefined); // => throws a ReferenceError
-    }
-
-    // creating a variable declaration after you
-    // reference the variable will work due to
-    // variable hoisting. Note: the assignment
-    // value of `true` is not hoisted.
-    function example() {
-      console.log(declaredButNotAssigned); // => undefined
-      var declaredButNotAssigned = true;
-    }
-
-    // the interpreter is hoisting the variable
-    // declaration to the top of the scope,
-    // which means our example could be rewritten as:
-    function example() {
-      let declaredButNotAssigned;
-      console.log(declaredButNotAssigned); // => undefined
-      declaredButNotAssigned = true;
-    }
-
-    // using const and let
-    function example() {
-      console.log(declaredButNotAssigned); // => throws a ReferenceError
-      console.log(typeof declaredButNotAssigned); // => throws a ReferenceError
-      const declaredButNotAssigned = true;
-    }
-    ```
-
-  <a name="hoisting--anon-expressions"></a><a name="14.2"></a>
-  - [14.2](#hoisting--anon-expressions) Anonymous function expressions hoist their variable name, but not the function assignment.
-
-    ```javascript
-    function example() {
-      console.log(anonymous); // => undefined
-
-      anonymous(); // => TypeError anonymous is not a function
-
-      var anonymous = function () {
-        console.log('anonymous function expression');
-      };
-    }
-    ```
-
-  <a name="hoisting--named-expresions"></a><a name="hoisting--named-expressions"></a><a name="14.3"></a>
-  - [14.3](#hoisting--named-expressions) Named function expressions hoist the variable name, not the function name or the function body.
-
-    ```javascript
-    function example() {
-      console.log(named); // => undefined
-
-      named(); // => TypeError named is not a function
-
-      superPower(); // => ReferenceError superPower is not defined
-
-      var named = function superPower() {
-        console.log('Flying');
-      };
-    }
-
-    // the same is true when the function name
-    // is the same as the variable name.
-    function example() {
-      console.log(named); // => undefined
-
-      named(); // => TypeError named is not a function
-
-      var named = function named() {
-        console.log('named');
-      };
-    }
-    ```
-
-  <a name="hoisting--declarations"></a><a name="14.4"></a>
-  - [14.4](#hoisting--declarations) Function declarations hoist their name and the function body.
-
-    ```javascript
-    function example() {
-      superPower(); // => Flying
-
-      function superPower() {
-        console.log('Flying');
-      }
-    }
-    ```
-
-  - For more information refer to [JavaScript Scoping & Hoisting](http://www.adequatelygood.com/2010/2/JavaScript-Scoping-and-Hoisting/) by [Ben Cherry](http://www.adequatelygood.com/).
-
-**[⬆ back to top](#table-of-contents)**
-
 ## Comparison Operators & Equality
 
   <a name="comparison--eqeqeq"></a><a name="15.1"></a>
@@ -2009,57 +1621,6 @@ Other Style Guides
     // good
     if (collection.length > 0) {
       // ...
-    }
-    ```
-
-  <a name="comparison--moreinfo"></a><a name="15.4"></a>
-  - [15.4](#comparison--moreinfo) For more information see [Truth Equality and JavaScript](https://javascriptweblog.wordpress.com/2011/02/07/truth-equality-and-javascript/#more-2108) by Angus Croll.
-
-  <a name="comparison--switch-blocks"></a><a name="15.5"></a>
-  - [15.5](#comparison--switch-blocks) Use braces to create blocks in `case` and `default` clauses that contain lexical declarations (e.g. `let`, `const`, `function`, and `class`). eslint: [`no-case-declarations`](https://eslint.org/docs/rules/no-case-declarations.html)
-
-    > Why? Lexical declarations are visible in the entire `switch` block but only get initialized when assigned, which only happens when its `case` is reached. This causes problems when multiple `case` clauses attempt to define the same thing.
-
-    ```javascript
-    // bad
-    switch (foo) {
-      case 1:
-        let x = 1;
-        break;
-      case 2:
-        const y = 2;
-        break;
-      case 3:
-        function f() {
-          // ...
-        }
-        break;
-      default:
-        class C {}
-    }
-
-    // good
-    switch (foo) {
-      case 1: {
-        let x = 1;
-        break;
-      }
-      case 2: {
-        const y = 2;
-        break;
-      }
-      case 3: {
-        function f() {
-          // ...
-        }
-        break;
-      }
-      case 4:
-        bar();
-        break;
-      default: {
-        class C {}
-      }
     }
     ```
 
@@ -3189,29 +2750,7 @@ Other Style Guides
     // good
     const val = parseInt(inputValue, 10);
     ```
-
-  <a name="coercion--comment-deviations"></a><a name="21.4"></a>
-  - [22.4](#coercion--comment-deviations) If for whatever reason you are doing something wild and `parseInt` is your bottleneck and need to use Bitshift for [performance reasons](https://jsperf.com/coercion-vs-casting/3), leave a comment explaining why and what you’re doing.
-
-    ```javascript
-    // good
-    /**
-     * parseInt was the reason my code was slow.
-     * Bitshifting the String to coerce it to a
-     * Number made it a lot faster.
-     */
-    const val = inputValue >> 0;
-    ```
-
-  <a name="coercion--bitwise"></a><a name="21.5"></a>
-  - [22.5](#coercion--bitwise) **Note:** Be careful when using bitshift operations. Numbers are represented as [64-bit values](https://es5.github.io/#x4.3.19), but bitshift operations always return a 32-bit integer ([source](https://es5.github.io/#x11.7)). Bitshift can lead to unexpected behavior for integer values larger than 32 bits. [Discussion](https://github.com/airbnb/javascript/issues/109). Largest signed 32-bit Int is 2,147,483,647:
-
-    ```javascript
-    2147483647 >> 0; // => 2147483647
-    2147483648 >> 0; // => -2147483648
-    2147483649 >> 0; // => -2147483647
-    ```
-
+    
   <a name="coercion--booleans"></a><a name="21.6"></a>
   - [22.6](#coercion--booleans) Booleans: eslint: [`no-new-wrappers`](https://eslint.org/docs/rules/no-new-wrappers)
 
@@ -3304,34 +2843,6 @@ Other Style Guides
     // see https://kangax.github.io/compat-table/es6/#test-WeakMap
     const firstNames = new WeakMap();
     firstNames.set(this, 'Panda');
-    ```
-
-  <a name="naming--self-this"></a><a name="22.5"></a>
-  - [23.5](#naming--self-this) Don’t save references to `this`. Use arrow functions or [Function#bind](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind).
-
-    ```javascript
-    // bad
-    function foo() {
-      const self = this;
-      return function () {
-        console.log(self);
-      };
-    }
-
-    // bad
-    function foo() {
-      const that = this;
-      return function () {
-        console.log(that);
-      };
-    }
-
-    // good
-    function foo() {
-      return () => {
-        console.log(this);
-      };
-    }
     ```
 
   <a name="naming--filename-matches-export"></a><a name="22.6"></a>
@@ -3471,9 +2982,6 @@ Other Style Guides
 
 ## Accessors
 
-  <a name="accessors--not-required"></a><a name="23.1"></a>
-  - [24.1](#accessors--not-required) Accessor functions for properties are not required.
-
   <a name="accessors--no-getters-setters"></a><a name="23.2"></a>
   - [24.2](#accessors--no-getters-setters) Do not use JavaScript getters/setters as they cause unexpected side effects and are harder to test, maintain, and reason about. Instead, if you do make accessor functions, use `getVal()` and `setVal('hello')`.
 
@@ -3516,161 +3024,6 @@ Other Style Guides
     }
     ```
 
-  <a name="accessors--consistent"></a><a name="23.4"></a>
-  - [24.4](#accessors--consistent) It’s okay to create `get()` and `set()` functions, but be consistent.
-
-    ```javascript
-    class Jedi {
-      constructor(options = {}) {
-        const lightsaber = options.lightsaber || 'blue';
-        this.set('lightsaber', lightsaber);
-      }
-
-      set(key, val) {
-        this[key] = val;
-      }
-
-      get(key) {
-        return this[key];
-      }
-    }
-    ```
-
-**[⬆ back to top](#table-of-contents)**
-
-## Events
-
-  <a name="events--hash"></a><a name="24.1"></a>
-  - [25.1](#events--hash) When attaching data payloads to events (whether DOM events or something more proprietary like Backbone events), pass an object literal (also known as a "hash") instead of a raw value. This allows a subsequent contributor to add more data to the event payload without finding and updating every handler for the event. For example, instead of:
-
-    ```javascript
-    // bad
-    $(this).trigger('listingUpdated', listing.id);
-
-    // ...
-
-    $(this).on('listingUpdated', (e, listingID) => {
-      // do something with listingID
-    });
-    ```
-
-    prefer:
-
-    ```javascript
-    // good
-    $(this).trigger('listingUpdated', { listingID: listing.id });
-
-    // ...
-
-    $(this).on('listingUpdated', (e, data) => {
-      // do something with data.listingID
-    });
-    ```
-
-  **[⬆ back to top](#table-of-contents)**
-
-## jQuery
-
-  <a name="jquery--dollar-prefix"></a><a name="25.1"></a>
-  - [26.1](#jquery--dollar-prefix) Prefix jQuery object variables with a `$`.
-
-    ```javascript
-    // bad
-    const sidebar = $('.sidebar');
-
-    // good
-    const $sidebar = $('.sidebar');
-
-    // good
-    const $sidebarBtn = $('.sidebar-btn');
-    ```
-
-  <a name="jquery--cache"></a><a name="25.2"></a>
-  - [26.2](#jquery--cache) Cache jQuery lookups.
-
-    ```javascript
-    // bad
-    function setSidebar() {
-      $('.sidebar').hide();
-
-      // ...
-
-      $('.sidebar').css({
-        'background-color': 'pink',
-      });
-    }
-
-    // good
-    function setSidebar() {
-      const $sidebar = $('.sidebar');
-      $sidebar.hide();
-
-      // ...
-
-      $sidebar.css({
-        'background-color': 'pink',
-      });
-    }
-    ```
-
-  <a name="jquery--queries"></a><a name="25.3"></a>
-  - [26.3](#jquery--queries) For DOM queries use Cascading `$('.sidebar ul')` or parent > child `$('.sidebar > ul')`. [jsPerf](http://jsperf.com/jquery-find-vs-context-sel/16)
-
-  <a name="jquery--find"></a><a name="25.4"></a>
-  - [26.4](#jquery--find) Use `find` with scoped jQuery object queries.
-
-    ```javascript
-    // bad
-    $('ul', '.sidebar').hide();
-
-    // bad
-    $('.sidebar').find('ul').hide();
-
-    // good
-    $('.sidebar ul').hide();
-
-    // good
-    $('.sidebar > ul').hide();
-
-    // good
-    $sidebar.find('ul').hide();
-    ```
-
-**[⬆ back to top](#table-of-contents)**
-
-## ECMAScript 5 Compatibility
-
-  <a name="es5-compat--kangax"></a><a name="26.1"></a>
-  - [27.1](#es5-compat--kangax) Refer to [Kangax](https://twitter.com/kangax/)’s ES5 [compatibility table](https://kangax.github.io/es5-compat-table/).
-
-**[⬆ back to top](#table-of-contents)**
-
-<a name="ecmascript-6-styles"></a>
-## ECMAScript 6+ (ES 2015+) Styles
-
-  <a name="es6-styles"></a><a name="27.1"></a>
-  - [28.1](#es6-styles) This is a collection of links to the various ES6+ features.
-
-1. [Arrow Functions](#arrow-functions)
-1. [Classes](#classes--constructors)
-1. [Object Shorthand](#es6-object-shorthand)
-1. [Object Concise](#es6-object-concise)
-1. [Object Computed Properties](#es6-computed-properties)
-1. [Template Strings](#es6-template-literals)
-1. [Destructuring](#destructuring)
-1. [Default Parameters](#es6-default-parameters)
-1. [Rest](#es6-rest)
-1. [Array Spreads](#es6-array-spreads)
-1. [Let and Const](#references)
-1. [Exponentiation Operator](#es2016-properties--exponentiation-operator)
-1. [Iterators and Generators](#iterators-and-generators)
-1. [Modules](#modules)
-
-  <a name="tc39-proposals"></a>
-  - [28.2](#tc39-proposals) Do not use [TC39 proposals](https://github.com/tc39/proposals) that have not reached stage 3.
-
-    > Why? [They are not finalized](https://tc39.github.io/process-document/), and they are subject to change or to be withdrawn entirely. We want to use JavaScript, and proposals are not JavaScript yet.
-
 **[⬆ back to top](#table-of-contents)**
 
 ## Standard Library
@@ -3710,28 +3063,6 @@ Other Style Guides
     Number.isFinite('2e3'); // false
     Number.isFinite(parseInt('2e3', 10)); // true
     ```
-
-**[⬆ back to top](#table-of-contents)**
-
-## Testing
-
-  <a name="testing--yup"></a><a name="28.1"></a>
-  - [30.1](#testing--yup) **Yup.**
-
-    ```javascript
-    function foo() {
-      return true;
-    }
-    ```
-
-  <a name="testing--for-real"></a><a name="28.2"></a>
-  - [30.2](#testing--for-real) **No, but seriously**:
-    - Whichever testing framework you use, you should be writing tests!
-    - Strive to write many small pure functions, and minimize where mutations occur.
-    - Be cautious about stubs and mocks - they can make your tests more brittle.
-    - We primarily use [`mocha`](https://www.npmjs.com/package/mocha) and [`jest`](https://www.npmjs.com/package/jest) at Airbnb. [`tape`](https://www.npmjs.com/package/tape) is also used occasionally for small, separate modules.
-    - 100% test coverage is a good goal to strive for, even if it’s not always practical to reach it.
-    - Whenever you fix a bug, _write a regression test_. A bug fixed without a regression test is almost certainly going to break again in the future.
 
 **[⬆ back to top](#table-of-contents)**
 
@@ -4004,3 +3335,5 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 We encourage you to fork this guide and change the rules to fit your team’s style guide. Below, you may list some amendments to the style guide. This allows you to periodically update your style guide without having to deal with merge conflicts.
 
 # };
+
+**[⬆ back to top](#table-of-contents)**
